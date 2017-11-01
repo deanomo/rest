@@ -1,0 +1,9 @@
+.metadata
+local.properties
+.settings/
+.idea/
+build/
+target/
+
+
+
