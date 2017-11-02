@@ -5,6 +5,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import entities.Car;
 import entities.Greeting;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import javax.annotation.PostConstruct;
 
 
 @RestController
@@ -20,10 +24,9 @@ public class Controller {
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
-    private String key = "spring.boot.redis.rest";
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+
+
 
     @RequestMapping("/greeting")
     public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
@@ -47,7 +50,6 @@ public class Controller {
             car.setMiles(car.getMiles() + 100);
         }
         // TODO: call persistence layer to update
-        set(car);
         return new ResponseEntity<Car>(car, HttpStatus.OK);
     }
 
@@ -59,19 +61,5 @@ public class Controller {
         }
         // TODO: call persistence layer to update
         return new ResponseEntity<List<Car>>(cars, HttpStatus.OK);
-    }
-
-    private Car get(String key) {
-        ValueOperations<String, String> ops = this.redisTemplate.opsForValue();
-
-    }
-
-
-    private void set(Car inCar) {
-        ValueOperations<String, Car> ops = this.redisTemplate.opsForValue();
-//        if (!this.redisTemplate.hasKey(key)) {
-//            ops.set(key, "navis");
-//        }
-        ops.set("car", inCar);
     }
 }
