@@ -4,15 +4,15 @@ package entities;
  * Created by bursode on 11/1/2017.
  */
 public class Car {
-    private String VIN;
+    private String vin;
     private String color;
     private Integer miles;
 
-    public String getVIN() {
-        return VIN;
+    public String getVin() {
+        return vin;
     }
-    public void setVIN(final String inVin) {
-        VIN = inVin;
+    public void setVin(final String inVin) {
+        vin = inVin;
     }
 
     public String getColor() {

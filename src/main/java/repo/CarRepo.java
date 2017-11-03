@@ -31,7 +31,7 @@ public class CarRepo {
 
 
     void saveCar(final Car inCar) {
-        hashOperations.put(KEY, inCar.getVIN(), inCar);
+        hashOperations.put(KEY, inCar.getVin(), inCar);
     }
 
     public Car findCar(final String carId) {
