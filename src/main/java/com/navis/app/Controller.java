@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.navis.entities.Person;
 import com.navis.entities.Name;
+import com.navis.entities.Ufv;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +60,13 @@ public class Controller {
             people.stream().forEach(p ->p.getName().setPrefix("Honorable"));
         }
         return new ResponseEntity<List<Person>>(people, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/ufv", method = RequestMethod.POST)
+    public ResponseEntity<Ufv> postPerson(@RequestBody Ufv inUfv) {
+        if (inUfv != null) {
+
+        }
+        return new ResponseEntity<Ufv>(inUfv, HttpStatus.OK);
     }
 }
