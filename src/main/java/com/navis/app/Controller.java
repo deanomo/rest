@@ -66,18 +66,12 @@ public class Controller {
 
     @RequestMapping(value = "/data", method = RequestMethod.POST)
     public ResponseEntity<ObjectWrapper[]> postData(@RequestBody ObjectWrapper[] inData) {
+
         for (ObjectWrapper ow: inData) {
-            String type = ow.getType();
-            Class clazz = null;
-            if ("ufv".equals(type)) {
-                clazz = Ufv.class;
-            } else if ("ues".equals(type)) {
-                clazz = UnitEquipment.class;
-            }
-            Class finalClazz = clazz;
-            List<Object> objs = (List<Object>)(Arrays.stream(ow.getObjects()).map(o -> new ObjectMapper().convertValue((Map)o, finalClazz)).collect(Collectors.toList()));
+            List<?> objs = ow.getObjects();
             objs.stream().forEach(System.out::println);
         }
         return new ResponseEntity<ObjectWrapper[]>(inData, HttpStatus.OK);
     }
+
 }
