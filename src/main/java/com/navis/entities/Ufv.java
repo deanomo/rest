@@ -26,6 +26,9 @@ public class Ufv {
      private Date ufvTimeEcOut;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
      private Date ufvTimeOut;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+     private Date ufvTimeIn;
      private String ufvDlvTimeAppntmnt;
      private String ufvGapptNbr;
      private String ufvTimeInventory;
@@ -61,6 +64,9 @@ public class Ufv {
      private String ufvFlexString09;
      private String ufvFlexString10;
      private String ufvFlexDate01;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private String ufvFlexDate02;
      private String ufvFlexDate03;
      private String ufvFlexDate04;
      private String ufvFlexDate05;
@@ -93,6 +99,9 @@ public class Ufv {
      private String ufvHasActiveAlarm;
      private String ufvGkey;
 
+    public String toString() {
+        return "ufvGkey:" + ufvGkey;
+    }
 
     public String getUfvHorizon() {
         return ufvHorizon;
@@ -180,6 +189,16 @@ public class Ufv {
 
     public void setUfvTimeOut(Date ufvTimeOut) {
         this.ufvTimeOut = ufvTimeOut;
+    }
+
+
+
+    public Date getUfvTimeIn() {
+        return ufvTimeIn;
+    }
+
+    public void setUfvTimeIn(Date ufvTimeIn) {
+        this.ufvTimeIn = ufvTimeIn;
     }
 
     public String getUfvDlvTimeAppntmnt() {
@@ -460,6 +479,14 @@ public class Ufv {
 
     public void setUfvFlexDate01(String ufvFlexDate01) {
         this.ufvFlexDate01 = ufvFlexDate01;
+    }
+
+    public String getUfvFlexDate02() {
+        return ufvFlexDate02;
+    }
+
+    public void setUfvFlexDate02(String ufvFlexDate02) {
+        this.ufvFlexDate02 = ufvFlexDate02;
     }
 
     public String getUfvFlexDate03() {

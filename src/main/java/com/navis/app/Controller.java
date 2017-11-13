@@ -1,12 +1,14 @@
 package com.navis.app;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
-import com.navis.entities.Person;
-import com.navis.entities.Name;
-import com.navis.entities.Ufv;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.navis.entities.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,11 +64,20 @@ public class Controller {
         return new ResponseEntity<List<Person>>(people, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/ufv", method = RequestMethod.POST)
-    public ResponseEntity<Ufv> postPerson(@RequestBody Ufv inUfv) {
-        if (inUfv != null) {
-
+    @RequestMapping(value = "/data", method = RequestMethod.POST)
+    public ResponseEntity<ObjectWrapper[]> postData(@RequestBody ObjectWrapper[] inData) {
+        for (ObjectWrapper ow: inData) {
+            String type = ow.getType();
+            Class clazz = null;
+            if ("ufv".equals(type)) {
+                clazz = Ufv.class;
+            } else if ("ues".equals(type)) {
+                clazz = UnitEquipment.class;
+            }
+            Class finalClazz = clazz;
+            List<Object> objs = (List<Object>)(Arrays.stream(ow.getObjects()).map(o -> new ObjectMapper().convertValue((Map)o, finalClazz)).collect(Collectors.toList()));
+            objs.stream().forEach(System.out::println);
         }
-        return new ResponseEntity<Ufv>(inUfv, HttpStatus.OK);
+        return new ResponseEntity<ObjectWrapper[]>(inData, HttpStatus.OK);
     }
 }

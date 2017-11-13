@@ -41,10 +41,12 @@ import java.util.Collections
  * Invoke a web service code extension on a list of specified nodes and concatenate all responses.
  */
 class RestRun extends GroovyApi {
-    /**
-     * Entry point for GroovyApi plugin
-     */
+
     public void execute(Map inParams) {
+        execute()
+    }
+
+    public void execute() {
         1.upto(10, _getLoop)
         1.upto(10, _postLoop)
     }
@@ -52,7 +54,9 @@ class RestRun extends GroovyApi {
     def _postLoop = {
         long now = System.currentTimeMillis()
         String response = doPost()
-        println (String.format("Call Post object 100 times: %dms", (System.currentTimeMillis() - now)))
+        String p = String.format("Call Post object 100 times: %dms", (System.currentTimeMillis() - now))
+        println (p)
+        return p
     }
 
     def _getLoop = {
@@ -119,7 +123,6 @@ class RestRun extends GroovyApi {
 
         @Override
         String call() throws Exception {
-            logInfo("call webservice:"+ "http://localhost:8280/" + _serverAddress + _params)
             HttpURLConnection connection = new URL( "http://localhost:8280/" + _serverAddress + _params).openConnection() as HttpURLConnection
             connection.setRequestProperty( 'User-Agent', 'groovy-2.4.4' )
             connection.setRequestProperty( 'Accept', 'application/json' )
