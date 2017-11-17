@@ -19,6 +19,6 @@
     <!--&lt;!&ndash; Jedis ConnectionFactory &ndash;&gt;-->
     <!--<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"/>-->
 
-    <bean id="repo" class="com.navis.repo.PersonRepo"/>
+    <bean id="repo" class="com.navis.repo.ObjectRepo"/>
 
 </beans>

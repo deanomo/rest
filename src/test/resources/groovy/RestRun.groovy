@@ -1,41 +1,28 @@
 package extension.system
 
-import com.fasterxml.jackson.annotation.JsonFormat
-import com.navis.argo.business.atoms.LocTypeEnum
-import com.navis.framework.metafields.MetafieldIdList
+import com.navis.argo.ArgoEntity
+import com.navis.argo.business.api.GroovyApi
+import com.navis.argo.business.model.CarrierVisit
+import com.navis.argo.business.xps.model.WorkAssignment
 import com.navis.framework.persistence.HibernateApi
 import com.navis.framework.portal.QueryUtils
 import com.navis.framework.portal.query.DomainQuery
-import com.navis.framework.portal.query.PredicateFactory
 import com.navis.framework.util.ValueObject
+
 import com.navis.inventory.InventoryEntity
-import com.navis.inventory.business.api.UnitField
+import com.navis.inventory.MovesEntity
+import com.navis.inventory.business.moves.WorkInstruction
+import com.navis.inventory.business.units.Unit
 import com.navis.inventory.business.units.UnitEquipment
 import com.navis.inventory.business.units.UnitFacilityVisit
-import org.codehaus.jackson.annotate.JsonGetter
 
-/**
- * Created by bursode on 11/2/2017.
- */
-import java.net.HttpURLConnection
 import org.codehaus.jackson.map.ObjectMapper
-import org.codehaus.jackson.map.*
-import org.codehaus.jackson.JsonNode
-import org.codehaus.jackson.JsonFactory
-import org.codehaus.jackson.JsonParser
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-
-import com.navis.argo.business.api.GroovyApi
-
-import org.apache.log4j.Logger
-
-import java.util.List
-import java.util.ArrayList
-import java.util.Collections
+import java.util.function.Supplier
 
 /**
  * Invoke a web service code extension on a list of specified nodes and concatenate all responses.
@@ -47,22 +34,31 @@ class RestRun extends GroovyApi {
     }
 
     public void execute() {
-        1.upto(10, _getLoop)
-        1.upto(10, _postLoop)
+        //       _bench {1.upto(10, _getLoop)}
+        _bench ({1.upto(2, _postLoop)}, "post")
     }
 
     def _postLoop = {
-        long now = System.currentTimeMillis()
         String response = doPost()
-        String p = String.format("Call Post object 100 times: %dms", (System.currentTimeMillis() - now))
-        println (p)
-        return p
     }
 
     def _getLoop = {
-        long now = System.currentTimeMillis();
         String response = doGet()
-        println (String.format("Call get object 100 times: %d ms", (System.currentTimeMillis() - now)))
+    }
+
+    def _bench = { inClosure, inText, inArg=null ->
+        def start, now, value
+        if (inArg==null) {
+            start = System.currentTimeMillis()
+            value = inClosure()
+            now = System.currentTimeMillis()
+        } else {
+            start = System.currentTimeMillis()
+            value = inClosure inArg
+            now = System.currentTimeMillis()
+        }
+        println(inText + ":" + (now-start))
+        return value
     }
 
     public String doGet() {
@@ -80,33 +76,81 @@ class RestRun extends GroovyApi {
         return responses
     }
 
-    private List<Map<String, String>> fetchEquipmentData() {
-        DomainQuery dq = QueryUtils.createDomainQuery(InventoryEntity.UNIT_EQUIPMENT)
-        Serializable[] ufvGkeys = HibernateApi.getInstance().findPrimaryKeysByDomainQuery(dq);
-        List<UnitEquipment> eq = ufvGkeys.collect {inIt -> (UnitEquipment) HibernateApi.getInstance().load(UnitFacilityVisit.class, inIt) }
-        List<ValueObject> visitObjects = eq.collect{inIt -> inIt.getValueObject()}
-        return visitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+    def _unitData = {
+        DomainQuery dq = QueryUtils.createDomainQuery(InventoryEntity.UNIT).setDqMaxResults(100)
+        List<Unit> unitList = HibernateApi.getInstance().findEntitiesByDomainQuery(dq);
+        List<ValueObject> unitObjects = unitList.collect{inIt -> inIt.getValueObject()}
+        List<Map<String, String>>  units = unitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return units
     }
 
+    def _workAssignments = {
+        DomainQuery dq = QueryUtils.createDomainQuery(ArgoEntity.WORK_ASSIGNMENT).setDqMaxResults(100)
+        List<WorkAssignment> waList = HibernateApi.getInstance().findEntitiesByDomainQuery(dq)
+        List<ValueObject> waObjects = waList.collect{inIt -> inIt.getValueObject()}
+        List<Map<String, String>>  was = waObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return was
+    }
 
-    private List<Map<String, String>> fetchUfvData() {
-        DomainQuery dq = QueryUtils.createDomainQuery(InventoryEntity.UNIT_FACILITY_VISIT)
+    def _workInstructions = {
+        DomainQuery dq = QueryUtils.createDomainQuery(MovesEntity.WORK_INSTRUCTION).setDqMaxResults(100)
+        List<WorkInstruction> wiList = HibernateApi.getInstance().findEntitiesByDomainQuery(dq)
+        println("work instructions found:" + wiList.size())
+        List<ValueObject> wiObjects = wiList.collect{inIt -> inIt.getValueObject()}
+        List<Map<String, String>>  wis = wiObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return wis
+    }
+
+    def _equipmentData = {
+        DomainQuery dq = QueryUtils.createDomainQuery(InventoryEntity.UNIT_EQUIPMENT).setDqMaxResults(100)
+        List<UnitEquipment> ueList = HibernateApi.getInstance().findEntitiesByDomainQuery(dq);
+        List<ValueObject> visitObjects = ueList.collect{inIt -> inIt.getValueObject()}
+        List<Map<String, String>>  ues = visitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return ues
+    }
+
+    def _ufvs = {
+        DomainQuery dq = QueryUtils.createDomainQuery(InventoryEntity.UNIT_FACILITY_VISIT).setDqMaxResults(100)
         Serializable[] ufvGkeys = HibernateApi.getInstance().findPrimaryKeysByDomainQuery(dq);
         List<UnitFacilityVisit> visits = ufvGkeys.collect {inIt -> (UnitFacilityVisit) HibernateApi.getInstance().load(UnitFacilityVisit.class, inIt) }
         List<ValueObject> visitObjects = visits.collect{inIt -> inIt.getValueObject()}
-        return visitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+
+        List<Map<String, String>>  maps = visitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return maps
     }
 
-    private doPost() {
-        def fieldLists = fetchUfvData()
-        def jsonLists = fieldLists.collect { inFl -> new ObjectMapper().writeValueAsString(inFl) }
-        def service = "rest/ufv"
-        Callable callable = new PostCallable(service, jsonLists.get(0))
-        ExecutorService executor = Executors.newFixedThreadPool(10)
+    def _carrierVisits = {
+        DomainQuery dq = QueryUtils.createDomainQuery(ArgoEntity.CARRIER_VISIT).setDqMaxResults(100)
+        List<CarrierVisit> visits = HibernateApi.getInstance().findEntitiesByDomainQuery(dq);
+        List<ValueObject> visitObjects = visits.collect{inIt -> inIt.getValueObject()}
+        List<Map<String, String>>  maps = visitObjects.collect {inIt -> inIt.getFields().collectEntries {[(it.getFieldId()):inIt.getFieldAsString(it)]}}
+        return maps
+    }
 
-        List<Future<String>> list = (1..100).collect {executor.submit(callable)}
+    def _payload = {
+
+        def ufvData = [type:"ufv", objects:_bench(_ufvs, "normalize ufvs:")]
+//        def uesData = [type:"ues", objects:_bench(_equipmentData, "normalize ues:")]
+//        def wasData = [type:"was", objects:_bench(_workAssignments, "normalize was:")]
+        def wisData = [type:"wis", objects:_bench(_workInstructions, "normalize wis:")]
+//        def unitData = [type:"unit", objects:_bench(_unitData, "normalize unit:")]
+//        def cvData = [type:"cvs", objects:_bench(_carrierVisits, "normalize cvs:")]
+        return _bench(_json, "test", [ufvData, wisData])
+
+    }
+
+    def _json = {
+        return  new ObjectMapper().writeValueAsString(it)
+    }
+
+
+    private doPost() {
+        def service = "rest/data"
+        def dataMap = _payload()
+        Callable callable = new PostCallable(service, dataMap)
+        ExecutorService executor = Executors.newFixedThreadPool(1)
+        List<Future<String>> list = (1..2).collect {executor.submit(callable)}
         List<String> responses = list.collect {inFuture -> inFuture.get()}
-        //String responses = list.collect {inFuture -> inFuture.get()}.join(",\n")
         executor.shutdown();
         return responses
     }
@@ -133,28 +177,26 @@ class RestRun extends GroovyApi {
 
     class PostCallable implements Callable<String> {
 
-        private final String _serverAddress;
-        private final String _params
+        private final String _serverAddress
+        private final String _payload
 
-        PostCallable(String inServerAddress, String inParams) {
+        PostCallable(final String inServerAddress, final String inPayload) {
             _serverAddress = inServerAddress
-//            _params = "{" + inParams.collect{ inK, inV -> "\"$inK\":\"$inV\""}.join(',') + "}"
-            _params = inParams
-        }
-        PostCallable(String inServerAddress, Map inParams) {
-            _serverAddress = inServerAddress
-            _params = new ObjectMapper().writeValueAsString(inParams)
+            _payload = inPayload
         }
 
         @Override
         String call() throws Exception {
-            HttpURLConnection connection = new URL( "http://localhost:8280/" + _serverAddress).openConnection() as HttpURLConnection
+            _bench(_call, "post and response:")
+        }
 
+        def _call = {
+            HttpURLConnection connection = new URL( "http://localhost:8280/" + _serverAddress).openConnection() as HttpURLConnection
             connection.setRequestMethod("POST")
             connection.setDoOutput(true)
             connection.setRequestProperty( 'User-Agent', 'groovy-2.4.4' )
             connection.setRequestProperty("Content-Type", "application/json")
-            connection.getOutputStream().write(_params.getBytes("UTF-8"));
+            connection.getOutputStream().write(_payload.getBytes("UTF-8"));
             def postRC = connection.getResponseCode();
             return connection.getInputStream().getText()
         }

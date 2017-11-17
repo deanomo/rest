@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.context.ApplicationContextAware;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,6 +46,14 @@ public class ObjectWrapperDeserializer extends JsonDeserializer<ObjectWrapper> {
                 return UnitEquipment.class;
             } else if( "ufv".equals(inType)) {
                 return  Ufv.class;
+            } else if("was".equals(inType)) {
+                return WorkAssignment.class;
+            } else if("wis".equals(inType)) {
+                return WorkInstruction.class;
+            } else if("unit".equals(inType)) {
+                return Unit.class;
+            } else if("cvs".equals(inType)) {
+                return CarrierVisit.class;
             }
             return null;
         }

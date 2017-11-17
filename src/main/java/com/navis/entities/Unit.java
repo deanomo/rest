@@ -1,18 +1,20 @@
 package com.navis.entities;
 
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 /**
- * Created by bursode on 11/11/2017.
+ * Created by bursode on 11/13/2017.
  */
-public class UnitEquipment {
+public class Unit {
     private String unitId;
     private String unitForeignHostKey;
     private String unitVisitState;
     private String unitNeedsReview;
     private String unitArePlacardsMismatched;
-    private String unitCreateTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private Date unitCreateTime;
     private String unitCategory;
     private String unitFreightKind;
     private String unitDrayStatus;
@@ -49,9 +51,12 @@ public class UnitEquipment {
     private String unitIsCtrSealed;
     private String unitIsBundle;
     private String unitRouting;
-    private String unitImportDeliveryOrderExpiryDate;
-    private String unitTimeDenormalizeCalc;
-    private String unitTimeLastStateChange;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private Date unitImportDeliveryOrderExpiryDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private Date unitTimeDenormalizeCalc;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private Date unitTimeLastStateChange;
     private String unitStoppedVessel;
     private String unitStoppedRail;
     private String unitStoppedRoad;
@@ -139,11 +144,11 @@ public class UnitEquipment {
         this.unitArePlacardsMismatched = unitArePlacardsMismatched;
     }
 
-    public String getUnitCreateTime() {
+    public Date getUnitCreateTime() {
         return unitCreateTime;
     }
 
-    public void setUnitCreateTime(String unitCreateTime) {
+    public void setUnitCreateTime(Date unitCreateTime) {
         this.unitCreateTime = unitCreateTime;
     }
 
@@ -435,27 +440,27 @@ public class UnitEquipment {
         this.unitRouting = unitRouting;
     }
 
-    public String getUnitImportDeliveryOrderExpiryDate() {
+    public Date getUnitImportDeliveryOrderExpiryDate() {
         return unitImportDeliveryOrderExpiryDate;
     }
 
-    public void setUnitImportDeliveryOrderExpiryDate(String unitImportDeliveryOrderExpiryDate) {
+    public void setUnitImportDeliveryOrderExpiryDate(Date unitImportDeliveryOrderExpiryDate) {
         this.unitImportDeliveryOrderExpiryDate = unitImportDeliveryOrderExpiryDate;
     }
 
-    public String getUnitTimeDenormalizeCalc() {
+    public Date getUnitTimeDenormalizeCalc() {
         return unitTimeDenormalizeCalc;
     }
 
-    public void setUnitTimeDenormalizeCalc(String unitTimeDenormalizeCalc) {
+    public void setUnitTimeDenormalizeCalc(Date unitTimeDenormalizeCalc) {
         this.unitTimeDenormalizeCalc = unitTimeDenormalizeCalc;
     }
 
-    public String getUnitTimeLastStateChange() {
+    public Date getUnitTimeLastStateChange() {
         return unitTimeLastStateChange;
     }
 
-    public void setUnitTimeLastStateChange(String unitTimeLastStateChange) {
+    public void setUnitTimeLastStateChange(Date unitTimeLastStateChange) {
         this.unitTimeLastStateChange = unitTimeLastStateChange;
     }
 

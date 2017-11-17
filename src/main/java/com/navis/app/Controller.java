@@ -1,20 +1,12 @@
 package com.navis.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.navis.entities.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import com.navis.repo.PersonRepo;
 
 
 @RestController
@@ -31,47 +23,16 @@ public class Controller {
 //    PersonRepo repo;
 
     @RequestMapping("/name")
-    public ResponseEntity<Name> getName(@RequestParam(value="given", defaultValue="World") String given) {
-        List<String> names = new ArrayList<String>();
-        names.add(given);
-        Name name = new Name();
-        name.setGiven(names);
-        return new ResponseEntity<Name>(name, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/person")
-    public ResponseEntity<Person> get(@RequestParam(value="id", defaultValue = "0") String id) {
-        Person person = new Person();
-        person.setId(id);
-        return new ResponseEntity<Person>(person, HttpStatus.OK);
-    }
-
-
-    @RequestMapping(value = "/person", method = RequestMethod.POST)
-    public ResponseEntity<Person> postPerson(@RequestBody Person person) {
-        if (person != null) {
-            person.getName().setPrefix("Mr.");
-        }
-        return new ResponseEntity<Person>(person, HttpStatus.OK);
-    }
-
-
-    @RequestMapping(value = "/people", method = RequestMethod.POST)
-    public ResponseEntity<List<Person>> postPeople(@RequestBody List<Person> people) {
-        if (people != null) {
-            people.stream().forEach(p ->p.getName().setPrefix("Honorable"));
-        }
-        return new ResponseEntity<List<Person>>(people, HttpStatus.OK);
+    public ResponseEntity<String> getName(@RequestParam(value="name", defaultValue="World") String name) {
+        return new ResponseEntity<String>(String.format(template, name), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/data", method = RequestMethod.POST)
     public ResponseEntity<ObjectWrapper[]> postData(@RequestBody ObjectWrapper[] inData) {
-
-        for (ObjectWrapper ow: inData) {
-            List<?> objs = ow.getObjects();
-            objs.stream().forEach(System.out::println);
-        }
+//        Arrays.stream(inData)
+//                .map(ow -> ow.getObjects())
+//                .flatMap(Collection::stream)
+//                .forEach(System.out::println);
         return new ResponseEntity<ObjectWrapper[]>(inData, HttpStatus.OK);
     }
-
 }
