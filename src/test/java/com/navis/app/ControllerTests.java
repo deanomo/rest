@@ -39,10 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //@ContextConfiguration(locations={"/applicationContext.xml"})
 public class ControllerTests {
+    private SimpleDateFormat _dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
 
     @Autowired
     private MockMvc mockMvc;
@@ -71,6 +69,7 @@ public class ControllerTests {
         this.mockMvc.perform(post("/data")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Date", _dateFormat.format(new Date()))
                 .content(payload.getBytes("UTF-8")))
                 .andDo(print())
                 .andExpect(status().isOk());

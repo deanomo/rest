@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.context.ApplicationContextAware;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,17 +29,16 @@ public class ObjectWrapperDeserializer extends JsonDeserializer<ObjectWrapper> {
         ObjectWrapper toObjectWrapper() {
             ObjectWrapper ow = new ObjectWrapper();
 
-            final Class classs = classForType(type);
-            ow.setType(classs);
-            List list = (List)Arrays.stream(objects)
-                    .map(o -> new ObjectMapper().convertValue(o, classs))
+            final Class clss = classForType(type);
+            ow.setType(clss);
+            List list = (List) Arrays.stream(objects)
+                    .map(o -> new ObjectMapper().convertValue(o, clss))
                     .collect(Collectors.toList());
             ow.setObjects(list);
             return ow;
         }
 
         private Class classForType(String inType) {
-            Class classs = null;
             if ("ues".equals(inType)) {
                 return UnitEquipment.class;
             } else if( "ufv".equals(inType)) {
@@ -54,6 +51,8 @@ public class ObjectWrapperDeserializer extends JsonDeserializer<ObjectWrapper> {
                 return Unit.class;
             } else if("cvs".equals(inType)) {
                 return CarrierVisit.class;
+            } else if("timing".equals(inType)) {
+                return TimingData.class;
             }
             return null;
         }
